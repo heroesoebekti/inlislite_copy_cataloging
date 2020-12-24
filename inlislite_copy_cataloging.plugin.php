@@ -2,8 +2,8 @@
 /**
  * Plugin Name: Inlislite Copy Cataloging
  * Plugin URI: https://github.com/heroesoebekti/inlislite_copy_cataloging
- * Description: Digunakan untuk saln katalog dari Aplikasi Inlislite.
- * Version: 1 beta
+ * Description: Add to copy-cataloging from an Inlislite app.
+ * Version: beta 1
  * Author: Heru Subekti
  * Author URI: https://www.facebook.com/heroe.soebekti
  */
