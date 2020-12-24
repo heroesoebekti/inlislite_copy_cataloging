@@ -109,7 +109,7 @@ if (isset($_POST['saveZ']) AND isset($_SESSION['marc_url'])) {
           // update index
           $indexer->makeIndex($biblio_id);
           // write to logs
-          utility::writeLogs($dbs, 'staff', $_SESSION['uid'], 'bibliography',sprintf(__('%s insert bibliographic data from MARC SRU service (server: %s) with title (%s) and biblio_id (%s)'),$_SESSION['realname'],$zserver,$data['title'],$biblio_id), 'MARC SRU', 'Add');         
+          utility::writeLogs($dbs, 'staff', $_SESSION['uid'], 'bibliography',sprintf(__('%s insert bibliographic data from Inlislite MARC-XML service (server: %s) with title (%s) and biblio_id (%s)'),$_SESSION['realname'],$zserver,$data['title'],$biblio_id), 'Inlislite MARC-XML', 'Add');         
           $r++;
       }
     }  
@@ -155,7 +155,7 @@ if(isset($_GET['in_search'])){
     $hasil = getData($_GET['keywords'],$_GET['marc_XML_source'],$_GET['page']);
     $_SESSION['marc_url'] = $_GET['marc_XML_source'];
 
-    echo '<div class="alert alert-info">ditemukan <strong>'.$hasil['total_records'].'</strong> cantuman dengan kata kunci pencarian <strong>'.$hasil['keywords'].'</strong> dari <i>'.$hasil['url'].'</i></div>';
+    echo '<div class="alert alert-info">Have found <strong>'.$hasil['total_records'].'</strong> records from searched keywords <strong>'.$hasil['keywords'].'</strong> from <i>'.$hasil['url'].'</i></div>';
 
     echo '<div class="p-3" style="padding: 0px 0px 0px 1rem !important;"><span id="pagingBox"></span></div>';
 
