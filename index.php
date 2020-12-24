@@ -150,94 +150,101 @@ if (isset($_POST['saveZ']) AND isset($_SESSION['marc_url'])) {
 </div>
 </div>
 <?php
+
 if(isset($_GET['in_search'])){
 
-    $hasil = getData($_GET['keywords'],$_GET['marc_XML_source'],$_GET['page']);
+    $result = getData($_GET['keywords'],$_GET['marc_XML_source'],$_GET['page'],$_GET['field']);
     $_SESSION['marc_url'] = $_GET['marc_XML_source'];
 
-    echo '<div class="alert alert-info">Have found <strong>'.$hasil['total_records'].'</strong> records from searched keywords <strong>'.$hasil['keywords'].'</strong> from <i>'.$hasil['url'].'</i></div>';
+    if($result){
 
-    echo '<div class="p-3" style="padding: 0px 0px 0px 1rem !important;"><span id="pagingBox"></span></div>';
+        echo '<div class="alert alert-info">'.sprintf(__('Have found <strong>%s</strong> records from searched keywords <strong>%s</strong> from <i>%s</i>'),$result['total_records'],$result['keywords'],$result['url']).'</div>';
+        echo '<div class="p-3" style="padding: 0px 0px 0px 1rem !important;"><span id="pagingBox"></span></div>';
 
-    $table = new simbio_table();
-    $table->table_attr = 'align="center" class="s-table table" cellpadding="5" cellspacing="0"';
-    echo  '<div class="p-3">
-            <input value="'.__('Check All').'" class="check-all button btn btn-default" type="button"> 
-            <input value="'.__('Uncheck All').'" class="uncheck-all button btn btn-default" type="button">
-            <input type="submit" name="saveZ" class="s-btn btn btn-success save" value="' . __('Save Marc Records to Database') . '" /></div>';
-    // table header
-    $table->setHeader(array(__('Select'),__('Title'),__('Publishing Place'),__('Publisher'),__('Publishing Year')));
-    $table->table_header_attr = 'class="dataListHeader alterCell font-weight-bold"';
+        $table = new simbio_table();
+        $table->table_attr = 'align="center" class="s-table table" cellpadding="5" cellspacing="0"';
+        echo  '<div class="p-3">
+                <input value="'.__('Check All').'" class="check-all button btn btn-default" type="button"> 
+                <input value="'.__('Uncheck All').'" class="uncheck-all button btn btn-default" type="button">
+                <input type="submit" name="saveZ" class="s-btn btn btn-success save" value="' . __('Save Marc Records to Database') . '" /></div>';
+        // table header
+        $table->setHeader(array(__('Select'),__('Title'),__('Publishing Place'),__('Publisher'),__('Publishing Year')));
+        $table->table_header_attr = 'class="dataListHeader alterCell font-weight-bold"';
 
-    $i = 0;
-    foreach ($hasil['data'] as $key=> $value) {
+        $i = 0;
+        foreach ($result['data'] as $key=> $value) {
 
-      $url_image = $value['img'];
-      if($value['img']==NULL){
-          $url_image = '../images/default/image.png';
-      }
+          $url_image = $value['img'];
+          if($value['img']==NULL){
+              $url_image = '../images/default/image.png';
+          }
 
-      $cb = '<input type="checkbox" name="zrecord['.$value['id'].']" value="'.$value['id'].'#'.urlencode($url_image).'">';
-      $title_content = '<div class="media">
-                    <img class="mr-3 rounded" src="'.$url_image.'" alt="cover image" style="height:70px;">
-                    <div class="media-body">
-                      <div class="title">'.stripslashes($value['title']).'</div><div class="authors">'.$value['author'].'</div>
-                    </div>
-                  </div>';
-      
-      $table->appendTableRow(array($cb,$title_content,$value['publish_place'],$value['publisher'],$value['publish_year']));
-      // set cell attribute
-      $row_class = ($i%2 == 0)?'alterCell':'alterCell2';
-      $table->setCellAttr($i, 0, ' valign="top" style="width: 5px;"');
-      $table->setCellAttr($i, 1, ' valign="top" style="width: auto;"');
-      $table->setCellAttr($i, 2, ' valign="top" style="width: auto;"');
-      $table->setCellAttr($i, 2, ' valign="top" style="width: auto;"');
-      $table->setCellAttr($i, 2, ' valign="top" style="width: auto;"');
-      $i++;
+          $cb = '<input type="checkbox" name="zrecord['.$value['id'].']" value="'.$value['id'].'#'.urlencode($url_image).'">';
+          $title_content = '<div class="media">
+                        <img class="mr-3 rounded" src="'.$url_image.'" alt="cover image" style="height:70px;">
+                        <div class="media-body">
+                          <div class="title">'.stripslashes($value['title']).'</div><div class="authors">'.$value['author'].'</div>
+                        </div>
+                      </div>';
+          
+          $table->appendTableRow(array($cb,$title_content,$value['publish_place'],$value['publisher'],$value['publish_year']));
+          // set cell attribute
+          $row_class = ($i%2 == 0)?'alterCell':'alterCell2';
+          $table->setCellAttr($i, 0, ' valign="top" style="width: 5px;"');
+          $table->setCellAttr($i, 1, ' valign="top" style="width: auto;"');
+          $table->setCellAttr($i, 2, ' valign="top" style="width: auto;"');
+          $table->setCellAttr($i, 2, ' valign="top" style="width: auto;"');
+          $table->setCellAttr($i, 2, ' valign="top" style="width: auto;"');
+          $i++;
 
+        }
+        echo $table->printTable(); 
+        $page = new simbio_paging();
+        echo '<script type="text/javascript">'."\n";
+        echo 'parent.$(\'#pagingBox\').html(\''.str_replace(array("\n", "\r", "\t"), '', $page->paging($result['total_records'],10)).'\');'."\n";
+        echo '</script>';
+      ?>
+      <script>
+          $('.save').on('click', function (e) {
+          var zrecord = {};
+          var uri = '<?php echo $php_self; ?>';
+          $("input[type=checkbox]:checked").each(function() {
+             zrecord[$(this).val()] = $(this).val();
+          });
+
+          $.ajax({
+                  url: uri,
+                  type: 'post',
+                  data: {saveZ: true,zrecord}
+              })
+                .done(function (msg) {
+                  //console.log(zrecord);
+                  parent.toastr.success(Object.keys(zrecord).length+" records inserted into the database", "MARC XML");
+                  $('[type=checkbox]').prop('checked', false).parents('tr').removeClass('alterCell highlighted');
+              })
+          })
+          $(".uncheck-all").on('click',function (e){
+              e.preventDefault()
+              $('[type=checkbox]').prop('checked', false).parents('tr').removeClass('alterCell highlighted');
+          });
+          $(".check-all").on('click',function (e){
+              e.preventDefault()
+              $('[type=checkbox]').prop('checked', true).parents('tr').addClass('alterCell highlighted');
+          });
+
+          $('td').click( function() {
+            if($(this).parents('tr').hasClass('alterCell')){
+              $(this).parents('tr').removeClass('alterCell highlighted').find(':checkbox').prop('checked',false);
+            }else{
+              $(this).parents('tr').addClass('alterCell highlighted').find(':checkbox').prop('checked',true);
+            }
+          });
+      </script>
+      <?php
+      exit();
     }
-    echo $table->printTable(); 
-    $page = new simbio_paging();
-    echo '<script type="text/javascript">'."\n";
-    echo 'parent.$(\'#pagingBox\').html(\''.str_replace(array("\n", "\r", "\t"), '', $page->paging($hasil['total_records'],10)).'\');'."\n";
-    echo '</script>';
-?>
-<script>
-    $('.save').on('click', function (e) {
-    var zrecord = {};
-    var uri = '<?php echo $php_self; ?>';
-    $("input[type=checkbox]:checked").each(function() {
-       zrecord[$(this).val()] = $(this).val();
-    });
-
-    $.ajax({
-            url: uri,
-            type: 'post',
-            data: {saveZ: true,zrecord}
-        })
-          .done(function (msg) {
-            //console.log(zrecord);
-            parent.toastr.success(Object.keys(zrecord).length+" records inserted into the database", "MARC XML");
-            $('[type=checkbox]').prop('checked', false).parents('tr').removeClass('alterCell highlighted');
-        })
-    })
-    $(".uncheck-all").on('click',function (e){
-        e.preventDefault()
-        $('[type=checkbox]').prop('checked', false).parents('tr').removeClass('alterCell highlighted');
-    });
-    $(".check-all").on('click',function (e){
-        e.preventDefault()
-        $('[type=checkbox]').prop('checked', true).parents('tr').addClass('alterCell highlighted');
-    });
-
-    $('td').click( function() {
-      if($(this).parents('tr').hasClass('alterCell')){
-        $(this).parents('tr').removeClass('alterCell highlighted').find(':checkbox').prop('checked',false);
-      }else{
-        $(this).parents('tr').addClass('alterCell highlighted').find(':checkbox').prop('checked',true);
-      }
-    });
-</script>
-<?php
-exit();
+    else{
+      echo '<div class="alert alert-danger">'.__('No Results Found!').'</div>';
+      exit();
+    }
 }

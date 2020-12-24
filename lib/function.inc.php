@@ -1,4 +1,13 @@
 <?php
+/**
+ * @Created by          : Heru Subekti (heroe.soebekti@gmail.com)
+ * @Date                : 23/12/20
+ * @File name           : function.inc.php
+ */
+
+// key to authenticate
+defined('INDEX_AUTH') OR die('Direct access not allowed!');
+
 session_start();
 
 function getMARC($dataID,$url){
@@ -282,14 +291,14 @@ function getMARC($dataID,$url){
 }
 
 
-function getData($keyword, $url,$page = '1'){
+function getData($keyword, $url,$page = '1',$field = 'Judul'){
  
   //remove temp cookie
   if($_SESSION['keyword']!=$keyword && file_exists(UPLOAD.'cache/cache')){
   	unlink(UPLOAD.'cache/cache');
   }		
 
-  $html_source = $url.'/opac/pencarian-sederhana?action=pencarianSederhana&katakunci='.urlencode($keyword).'&ruas=Judul&bahan=Semua+Jenis+Bahan&limit=10&page='.($page??1);
+  $html_source = $url.'/opac/pencarian-sederhana?action=pencarianSederhana&katakunci='.urlencode($keyword).'&ruas='.urlencode($field).'&bahan=Semua+Jenis+Bahan&limit=10&page='.($page??1);
   $curl = curl_init();
   curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, true);
   curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
@@ -301,7 +310,6 @@ function getData($keyword, $url,$page = '1'){
   curl_setopt ($curl,CURLOPT_CONNECTTIMEOUT,120);
   curl_setopt ($curl,CURLOPT_TIMEOUT,120);
   curl_setopt ($curl,CURLOPT_MAXREDIRS,10);
-  curl_setopt($curl, CURLOPT_RETURNTRANSFER, TRUE);
   curl_setopt($curl, CURLOPT_COOKIEJAR, UPLOAD . "cache/cache");  
   curl_setopt($curl, CURLOPT_COOKIEFILE, UPLOAD . "cache/cache");
   $str = curl_exec($curl);
@@ -376,6 +384,9 @@ function getData($keyword, $url,$page = '1'){
     'total_records'=>$total, 
     'keywords'=> $keyword,
     'data'=> $data);
-  
+
+  if($total<1){
+    return false;
+  }  
   return $result;
 }
