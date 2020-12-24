@@ -1,0 +1,17 @@
+This plugin is made to copy-cataloging from a library which is using Inlislite app made by National Library of Republic of Indonesia.
+
+Installation : Extract this plugin under the directory named "plugins" within your root installation of SLiMS.
+Installation : Make sure that codes are placed under "inlislite_copy_cataloging" directory.
+Activation : To start using this plugin, start activating it under System module > Plugins sub-menu
+Activation : Slide the function from "Disabled" to "Enabled".
+Usage : The plugin will be active and placed under the Bibliography module > Inlislite Copy Cataloging sub-menu.
+
+==========
+
+Plugin ini digunakan untuk melakukan salin katalog dari aplikasi Inlislite yang dibuat oleh Perpustakaan Nasional Republik Indonesia.
+
+Pemasangan : Ekstrak plugin ini ke dalam direktori "plugins" yang berada dalam direktori utama SLiMS.
+Pemasangan : Pastikan bahwa semua kode berada dalam direktori dengan nama "inlislite_copy_cataloging".
+Aktivasi : Untuk mengaktifkan plugin ini, masuk ke dalam modul System > sub-menu Plugins.
+Aktivasi : Ubah status plugin dari "Nonaktif" ke "Aktif".
+Penggunaan : Jika sudah aktif, plugin ini dapat digunakan lewat modul Bibliografi > sub-menu Inlislite Copy Cataloging.
